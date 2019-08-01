@@ -89,6 +89,10 @@ physics:
       TrackToPFParticleAssModuleLabel:   "pandora"
 
       SoftwareTriggerAlgo:               "BNB_FEMBeamTriggerAlgo"
+
+      POTSummaryOverlayLabel:              "generator"
+      POTSummaryDataLabel:                 "beamdata"
+      POTSummaryDataInstanceNameLabel:     "bnbETOR860"
     }
   }
   analysis: [CaliTTCreatorFinder]

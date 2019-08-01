@@ -79,6 +79,9 @@ bool GetFile(TFile* &f , TString string){
 // -----------------------------------------------------------------------------
 void DrawTH1D_SAME(TH1D* hist, std::string variation, TLegend* legend, std::string histname){
     
+    IncreaseLabelSize(hist);
+    legend->SetTextSize(.05);
+
     std::string draw_spec = "his, same";
 
     // ----------------------
@@ -358,6 +361,70 @@ double GetTrackLength(double startx, double starty, double startz,
 
 }
 // -----------------------------------------------------------------------------
+double GetPOT(const char * _file1){
+	double POT{0};
+	std::string line;
+
+	std::string filename;
+	std::string temp_filename = _file1; // cast to string
+	filename = "File: " + temp_filename;
+
+	std::cout << filename << std::endl;
+
+    // Get the variation name by stripping the input file name
+    std::vector<std::string> variations = {"BNBCV", "BNBDLup"};
+
+    bool bool_string{false};
+    // Find the variation name in the string
+    for (int i = 0; i < variations.size(); i++){
+    
+        size_t found = fileame.find(variations.at(i)); 
+        
+        // Got the variation match
+        if (found != std::string::npos) {
+            bool_string = true;
+            filename = variations.at(i);
+        }   
+    }
+
+    if (!bool_string) {
+        std::cout << "Unable to open file" << std::endl; 
+        return POT;
+    }
+
+	std::ifstream myfile ("POT_List.txt");
+	int i_POT{0};
+	
+	if (myfile.is_open()) {
+
+		// Loop over lines in file
+		while ( getline (myfile,line) ) {
+
+			if (i_POT == 1){
+				line.erase(0, 21);
+				POT = std::stod(line); // Convert string to double
+				std::cout << "POT in File:\t"<< POT << std::endl;
+				return POT;
+			}
+
+			// Look for var name in the file
+            size_t found = line.find(filename); 
+        
+            // Got the variation match
+            if (found != std::string::npos) {
+                std::cout << "Found match for POT file"<< std::endl;
+				i_POT++;
+            }   
+			
+		}
+
+		myfile.close();
+	}
+	else std::cout << "Unable to open file" << std::endl; 
+	
+    std::cout << "Could not find a match for POT file"<< std::endl;
+	return POT;
+}
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

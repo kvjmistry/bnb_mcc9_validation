@@ -56,7 +56,7 @@
 #include "larcorealg/Geometry/PlaneGeo.h"
 #include "larcorealg/Geometry/WireGeo.h"
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h" // raw::Compress_t, raw::Channel_t
-//#include "larcoreobj/SummaryData/POTSummary.h"
+#include "larcoreobj/SummaryData/POTSummary.h"
 #include "larcoreobj/SimpleTypesAndConstants/geo_types.h"
 #include "lardataobj/AnalysisBase/ParticleID_VariableTypeEnums.h"
 
@@ -158,12 +158,15 @@ private:
     std::string fPFParticleToTrackAssModuleLabel;
     std::string fTrackToPFParticleAssModuleLabel;
     std::string fSoftwareTriggerAlgo;
+    std::string fPOTSummaryOverlayLabel;
+    std::string fPOTSummaryDataLabel;
+    std::string fPOTSummaryDataInstanceNameLabel;
 
     art::ServiceHandle<art::TFileService> tfs;
     art::ServiceHandle<geo::Geometry> geom;
 
     TTree *myTTree;
-    //		TTree* myPOT;
+    TTree* myPOT;
     int NEvents;
     int isData;
     int RunNumber;
@@ -172,10 +175,10 @@ private:
     int EventPassedSwTrigger;
     int ientry;
 
-    //		double pot_total;
-    //		double pot;
-    //		double TotalPOT;
-    //		double POT;
+    double pot_total;
+    double pot;
+    double TotalPOT;
+    double POT;
 
     double Cosmic;
 
@@ -567,6 +570,10 @@ mynamespace::TTreeCreator::TTreeCreator(fhicl::ParameterSet const &p) : EDAnalyz
     fPFParticleToTrackAssModuleLabel = p.get<std::string>("PFParticleToTrackAssModuleLabel");
     fTrackToPFParticleAssModuleLabel = p.get<std::string>("TrackToPFParticleAssModuleLabel");
     fSoftwareTriggerAlgo = p.get<std::string>("SoftwareTriggerAlgo");
+
+    fPOTSummaryOverlayLabel = p.get< std::string >("POTSummaryOverlayLabel");
+	fPOTSummaryDataLabel = p.get< std::string >("POTSummaryDataLabel");
+	fPOTSummaryDataInstanceNameLabel = p.get< std::string >("POTSummaryDataInstanceNameLabel");
 }
 // _________________________________________________________________________________________________________________________________________________________________________________________________
 
@@ -575,15 +582,15 @@ void mynamespace::TTreeCreator::beginJob()
 
     Cosmic = -99.;
 
-    //	pot_total = 0;
-    //	pot = 0;
+    pot_total = 0;
+    pot = 0;
 
-    //	myPOT = tfs->make<TTree>("myPOT", "myPOT");
+    myPOT = tfs->make<TTree>("myPOT", "myPOT");
     myTTree = tfs->make<TTree>("myTTree", "myTTree");
     // _________________________________________________________________________________________________________________________________________________________________________________________________
 
-    //	myPOT->Branch("POT", &POT);
-    //	myPOT->Branch("TotalPOT", &TotalPOT);
+    myPOT->Branch("POT", &POT);
+    myPOT->Branch("TotalPOT", &TotalPOT);
 
     myTTree->Branch("isData", &isData, "isData/I");
     myTTree->Branch("RunNumber", &RunNumber, "RunNumber/I");
@@ -2783,17 +2790,21 @@ void mynamespace::TTreeCreator::endJob()
               << std::endl;
 }
 //___________________________________________________________________________________________________________________________________________________________________________________________________
-void mynamespace::TTreeCreator::endSubRun ( art::SubRun &sr) {
+void mynamespace::TTreeCreator::endSubRun ( const art::SubRun &sr) {
 
-    _sr_run = sr.run();
-    _sr_subrun = sr.subRun();
-    
-    art::Handle < sumdata::POTSummary > potsum_h ;
-    if (sr.getByLabel ("generator", potsum_h ) ) {
-        _sr_pot = potsum_h -> totpot ;
-    }
+    // POT Summary
 
-    _sr_tree->Fill() ;
+	art::Handle<sumdata::POTSummary> potListHandle;
+	if (sr.getByLabel(fPOTSummaryOverlayLabel,potListHandle)) { pot = potListHandle->totpot; } 
+	else if (sr.getByLabel(fPOTSummaryDataLabel,fPOTSummaryDataInstanceNameLabel,potListHandle)) { pot = potListHandle->totpot; } 
+	else { pot = 0.; }
+
+	pot_total += pot;
+	POT = pot;
+	TotalPOT = pot_total;
+	myPOT->Fill();
+
+	std::cout << std::endl << "pot = " << pot << " pot_total  = " << pot_total << std::endl << std::endl;
 }
 //___________________________________________________________________________________________________________________________________________________________________________________________________
 

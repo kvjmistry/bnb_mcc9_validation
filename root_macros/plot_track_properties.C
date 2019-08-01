@@ -5,10 +5,7 @@
 
 void plot_track_properties(const char * _file1, TString plot_config){
 
-    // std::cout << "=================================================\n" << std::endl;
-    // std::cout << "Warning, there are hardcoded values" << 
-    // 	"in this script, grep for  \"HARDCODED\" for places\n" << std::endl;
-    // std::cout << "=================================================\n" << std::endl;
+
     
     enum TH1D_names{kRunNumber,
                     kTrackResStartX, kTrackResStartY, kTrackResStartZ,
@@ -67,6 +64,7 @@ void plot_track_properties(const char * _file1, TString plot_config){
     TTree* myTTree;
     booltree = GetTree(inFile, myTTree, "CaliTTCreatorFinder/myTTree");
     if (booltree == false) gSystem->Exit(0);
+    
     int RunNumber;
     std::vector<int> *Track_MCParticle_Origin{nullptr};
     
@@ -156,14 +154,23 @@ void plot_track_properties(const char * _file1, TString plot_config){
     // Get the variation name by stripping the input file name
     std::vector<std::string> variations = {"BNBCV", "BNBDLup"};
 
+    bool bool_string{false};
     // Find the variation name in the string
     for (int i = 0; i < variations.size(); i++){
     
         size_t found = dirname.find(variations.at(i)); 
         
         // Got the variation match
-        if (found != std::string::npos) dirname = variations.at(i);
-        
+        if (found != std::string::npos) {
+            bool_string = true;
+            dirname = variations.at(i);
+        }   
+    }
+
+    if (!bool_string) {
+        std::cout << "Error variation string not found in the file, you need to fix file name" << std::endl;
+        gSystem->Exit(0);
+
     }
 
     std::cout << "dirname:\t" << dirname << std::endl;

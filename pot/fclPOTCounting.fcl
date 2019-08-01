@@ -1,0 +1,45 @@
+#include "geometry.fcl"
+#include "services_microboone.fcl"
+#include "messageservice.fcl"
+##include "mctruthmatching_uboone.fcl"
+##include "mctruthassociations_uboone.fcl"
+
+process_name : POTCountingProcess
+
+services:
+{
+  TFileService: {fileName: "myPOTCounting.root"}
+  @table::microboone_simulation_services
+#  BackTrackerService:                       @local::microboone_backtrackerservice
+#  ParticleInventoryService:                 @local::standard_particleinventoryservice
+#  Geometry:                                 @local::standard_geo
+}#end services
+
+source:
+{
+  module_type: RootInput
+  maxEvents: -1
+  firstRun: 1
+  firstEvent: 1
+}
+
+physics:
+{
+  analyzers:
+  {
+    POTCountingFinder:
+    {
+
+      module_type: "POTCounting"
+
+      POTSummaryOverlayLabel:              "generator"
+      POTSummaryDataLabel:                 "beamdata"
+      POTSummaryDataInstanceNameLabel:     "bnbETOR860"
+
+    }
+  }
+  analysis: [POTCountingFinder]
+  end_paths: [analysis]
+}
+
+services.DetectorClocksService.InheritClockConfig: false
