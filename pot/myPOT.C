@@ -12,13 +12,14 @@
 #include <stdlib.h>
 
 using namespace std;
-
+// -----------------------------------------------------------------------------
 void myPOT::Loop() {
    
-  if (fChain == 0){ 
+  if (fChain == 0) { 
     std::cout << "Error no chain" << std::endl;
     return;
   }
+
   Long64_t nentries = fChain->GetEntriesFast();
   Long64_t nbytes = 0, nb = 0;
 
@@ -35,5 +36,5 @@ void myPOT::Loop() {
 
   std::cout << "Total POT = " <<  POTCount << std::endl;
   
-
 } // End of the program
+// -----------------------------------------------------------------------------
