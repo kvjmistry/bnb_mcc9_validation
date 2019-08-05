@@ -7,7 +7,8 @@
 #include <TString.h>
 
 //TString path = "/pnfs/uboone/persistent/users/apapadop/OverlayDirt9POTCounting/v08_00_00_17/myOverlayDirt9_POTCounting_Run1_v08_00_00_17_Part1.root";
-TString path = "/uboone/data/users/kmistry/work/MCC9/test/myMCC9FirstValidation_20k_Part1.root";
+TString path = "/pnfs/uboone/scratch/users/kmistry/MCC9/bnb_nu_overlay_run1_DLup_analyse/analyse/22135825_0/bnb_mcc9_validation_BNBDLup.root";
+// TString path = "/pnfs/uboone/scratch/users/kmistry/MCC9/bnb_nu_overlay_run1_cv_analyse/analyse/22135824_3/bnb_mcc9_validation_BNBCV.root";
 // -----------------------------------------------------------------------------
 class myPOT {
 public:
@@ -36,7 +37,6 @@ public:
 };
 
 #endif
-// -----------------------------------------------------------------------------
 #ifdef myPOT_cxx
 myPOT::myPOT(TTree *tree) : fChain(0) {
     // if parameter tree is not specified (or zero), connect the file
@@ -106,6 +106,7 @@ void myPOT::Init(TTree *tree) {
     // Set branch addresses and branch pointers
     if (!tree)
         return;
+    
     fChain = tree;
     fCurrent = -1;
     fChain->SetMakeClass(1);
